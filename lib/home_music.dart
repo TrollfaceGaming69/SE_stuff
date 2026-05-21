@@ -27,9 +27,9 @@ class MyApp extends StatelessWidget {
 class PlaylistPage extends StatelessWidget {
   const PlaylistPage({super.key});
 
-  final Color color0 = const Color(0xFF969DEE);
-  final Color color50 = const Color(0xFFC9AFE6);
-  final Color color90 = const Color(0xFFF6BFDF);
+  final Color color0 = const Color(0xFF444B9D);
+  final Color color50 = const Color(0xFF6D439B);
+  final Color color90 = const Color(0xFFD784B4);
   final Color colorMainContainer = const Color(0xFFE8DEF8);
   final Color colorInnerContainer = const Color(0xFF969DEE);
   final Color colorButton = const Color(0xFF4E207E);

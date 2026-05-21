@@ -35,7 +35,6 @@ class LoginPage extends StatelessWidget {
                           horizontal: 24.0, vertical: 32.0),
                       child: Column(
                         children: [
-                          // App Logo
                           Image.asset(
                             'lib/assets/images/app_logo.png',
                             width: 160,
