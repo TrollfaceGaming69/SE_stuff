@@ -5,10 +5,10 @@ Projek matkul binus digidaw awikwok
 
 ## Getting Started
 Make sure you have installed the dependencies:
-* [Flutter SDK](https://docs.flutter.dev/get-started/install) (Versi terbaru direkomendasikan)
+* [Flutter SDK](https://docs.flutter.dev/get-started/install) 
 * [Dart SDK](https://dart.dev/get-started/sdk)
 * Android Studio / VS Code
-* [Firebase CLI](https://firebase.google.com/docs/cli) (Untuk konfigurasi Firebase)
+* [Firebase CLI](https://firebase.google.com/docs/cli)
 
 ## Installation
 
