@@ -1,6 +1,6 @@
 # MyStudy
 Projek matkul binus digidaw awikwok
-![Preview](https://id.pinterest.com/pin/1132092425100393861/)
+![Preview](https://i.pinimg.com/736x/d8/f2/a5/d8f2a591904b9dbc1ad631896f251119.jpg)
 
 
 ## Getting Started
