@@ -58,3 +58,5 @@ lib/
 
 
 ## Architecture Diagram
+<img width="464" height="275" alt="image" src="https://github.com/user-attachments/assets/ab76b985-409c-43cb-a5b8-f6d286eb22e4" />
+
