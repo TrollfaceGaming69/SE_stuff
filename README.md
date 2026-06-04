@@ -8,7 +8,7 @@ MyStudy is a mobile app designed to help students manage learning activities in 
 The primary features includes in this app are To-do list, Pomodoro Timer, Calendar, and Music Player
 
 ## Getting Started
-Make sure you have installed this dependencies:
+Make sure you have installed these dependencies:
 * [Flutter SDK](https://docs.flutter.dev/get-started/install) 
 * [Dart SDK](https://dart.dev/get-started/sdk)
 * [Firebase CLI](https://firebase.google.com/docs/cli)
