@@ -36,6 +36,7 @@ flutter run
 ```
 
 ## Folder Structure
+```sh
 lib/
 ├── main.dart                 → Entry point of the app
 ├── firebase_options.dart     → Firebase configuration
@@ -53,6 +54,7 @@ lib/
 └── view_model/               → App state management
     ├── handle_login.dart
     └── handle_register.dart
+```
 
 
 ## Architecture Diagram
