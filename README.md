@@ -3,11 +3,14 @@ Projek matkul binus digidaw awikwok
 ![Preview](https://i.pinimg.com/736x/d8/f2/a5/d8f2a591904b9dbc1ad631896f251119.jpg)
 
 
+## Project Description
+MyStudy is a mobile app designed to help students manage learning activities in one integrated platform.
+The primary features includes in this app are To-do list, Pomodoro Timer, Calendar, and Music Player
+
 ## Getting Started
-Make sure you have installed the dependencies:
+Make sure you have installed this dependencies:
 * [Flutter SDK](https://docs.flutter.dev/get-started/install) 
 * [Dart SDK](https://dart.dev/get-started/sdk)
-* Android Studio / VS Code
 * [Firebase CLI](https://firebase.google.com/docs/cli)
 
 ## Installation
@@ -31,3 +34,25 @@ flutter pub get
 bash
 flutter run
 ```
+
+## Folder Structure
+lib/
+├── main.dart                 → Entry point of the app
+├── firebase_options.dart     → Firebase configuration
+├── assets/images/            → App images
+├── pages/                    → UI screens
+│   ├── home.dart
+│   ├── home_music.dart
+│   ├── landing_page.dart
+│   ├── login.dart
+│   ├── register.dart
+│   └── profile.dart
+├── services/                 → Business logic (API, auth, etc.)
+│   └── auth_service.dart
+├── model/                    → Data models
+└── view_model/               → App state management
+    ├── handle_login.dart
+    └── handle_register.dart
+
+
+## Architecture Diagram
