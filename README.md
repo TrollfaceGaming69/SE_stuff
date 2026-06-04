@@ -1,7 +1,4 @@
 # MyStudy
-Projek matkul binus digidaw awikwok
-![Preview](https://i.pinimg.com/736x/d8/f2/a5/d8f2a591904b9dbc1ad631896f251119.jpg)
-
 
 ## Project Description
 MyStudy is a mobile app designed to help students manage learning activities in one integrated platform.
