@@ -50,10 +50,18 @@ class AuthService {
     await _auth.signOut();
   }
 
-  String _handleAuthError(String code){
+  String _handleAuthError(String code) {
     switch (code) {
       case "user-not-found":
         return 'No account found with this email.';
+      case "wrong-password":
+        return 'Password not match.';
+      case "invalid-credential": 
+        return 'Email or password does not match.';
+      case "invalid-email":
+        return 'The email address is badly formatted.';
+      case "user-disabled":
+        return 'This user account has been deleted.';
       default:
         return 'Something went wrong. Please try again.';
     }

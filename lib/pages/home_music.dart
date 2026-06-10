@@ -2,34 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'home.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Playlist Linker',
-      theme: ThemeData(
-        textTheme: GoogleFonts.interTextTheme(),
-      ),
-      home: const PlaylistPage(),
-    );
-  }
-}
 
 class PlaylistPage extends StatelessWidget {
   const PlaylistPage({super.key});
 
-  final Color color0 = const Color(0xFF444B9D);
-  final Color color50 = const Color(0xFF6D439B);
-  final Color color90 = const Color(0xFFD784B4);
+  final Color color0 = const Color(0xFF969DEE);
+  final Color color50 = const Color(0xFFC9AFE6);
+  final Color color90 = const Color(0xFFF6BFDF);
   final Color colorMainContainer = const Color(0xFFE8DEF8);
   final Color colorInnerContainer = const Color(0xFF969DEE);
   final Color colorButton = const Color(0xFF4E207E);
@@ -54,32 +33,7 @@ class PlaylistPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 25),
             child: Column(
               children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
-                        const SizedBox(width: 10),
-                        Text(
-                          'Back',
-                          style: GoogleFonts.inter(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 20),
+                const SizedBox(height: 30),
 
                 Container(
                   height: 180,
@@ -113,9 +67,9 @@ class PlaylistPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
   
-                      const Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                        children: const [
                           Icon(Icons.shuffle, size: 20),
                           SizedBox(width: 15),
                           Icon(Icons.skip_previous, size: 24),
@@ -147,7 +101,7 @@ class PlaylistPage extends StatelessWidget {
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorButton,
-                      shape: RoundedRectangleAction(borderRadius: BorderRadius.circular(20)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     ),
                     child: Text(
                       "Link Your Playlists Here!",
@@ -178,7 +132,6 @@ class PlaylistPage extends StatelessWidget {
           ),
         ),
       ),
-      
     );
   }
 
@@ -249,8 +202,4 @@ class PlaylistPage extends StatelessWidget {
       ),
     );
   }
-}
-
-class RoundedRectangleAction extends RoundedRectangleBorder {
-  const RoundedRectangleAction({super.borderRadius = const BorderRadius.all(Radius.circular(20))});
 }

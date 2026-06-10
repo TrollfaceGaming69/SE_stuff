@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:my_study/services/auth_service.dart';
 
-class HandleRegister extends ChangeNotifier{
+class HandleRegister extends ChangeNotifier {
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
   final usernameController = TextEditingController();
@@ -16,14 +16,38 @@ class HandleRegister extends ChangeNotifier{
   String? get errorMessage => _errorMessage;
   String? get selectedGender => _selectedGender;
 
-  void setGender(String gender){
+  void setGender(String gender) {
     _selectedGender = gender;
+    _errorMessage = null;
     notifyListeners();
   }
 
   Future<bool> handleRegister() async {
-    if(_selectedGender == null ){
-      _errorMessage = "Please Input a Gender";
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final username = usernameController.text.trim();
+    final phone = phoneController.text.trim();
+
+    if (username.isEmpty || email.isEmpty || password.isEmpty || phone.isEmpty) {
+      _errorMessage = "All fields are required.";
+      notifyListeners();
+      return false;
+    }
+
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
+      _errorMessage = "Please enter a valid email address.";
+      notifyListeners();
+      return false;
+    }
+
+    if (password.length < 8) {
+      _errorMessage = "Password must be at least 8 characters.";
+      notifyListeners();
+      return false;
+    }
+
+    if (_selectedGender == null) {
+      _errorMessage = "Please select a gender.";
       notifyListeners();
       return false;
     }
@@ -33,23 +57,32 @@ class HandleRegister extends ChangeNotifier{
     notifyListeners();
 
     final error = await _authService.register(
-  email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-      username: usernameController.text.trim(),
-      phoneNumber: phoneController.text.trim(),
+      email: email,
+      password: password,
+      username: username,
+      phoneNumber: phone,
       gender: _selectedGender!,
     );
 
     _isLoading = false;
 
-    if(error != null){
+    if (error != null) {
       _errorMessage = error;
       notifyListeners();
       return false;
     }
 
+    _clearControllers();
     notifyListeners();
     return true;
+  }
+
+  void _clearControllers() {
+    emailController.clear();
+    phoneController.clear();
+    usernameController.clear();
+    passwordController.clear();
+    _selectedGender = null;
   }
 
   @override
