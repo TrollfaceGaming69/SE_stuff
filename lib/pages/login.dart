@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../view_model/handle_login.dart';
-import 'home.dart';
 import 'register.dart';
 
 class LoginPage extends StatefulWidget {
@@ -24,10 +23,7 @@ class _LoginPageState extends State<LoginPage> {
     if (!mounted) return;
 
     if (success) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
+      Navigator.of(context).popUntil((route) => route.isFirst);
     } else {
       setState(() {}); 
     }

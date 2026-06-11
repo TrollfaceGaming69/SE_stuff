@@ -23,8 +23,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if(!mounted) return;
 
     if(success){
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage())
-      );
+      Navigator.of(context).popUntil((route) => route.isFirst);
     }
     else{
       setState(() {});

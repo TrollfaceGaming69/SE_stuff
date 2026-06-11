@@ -1,12 +1,21 @@
 // ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'firebase_options.dart';
 import './pages/home.dart';
 import './pages/calendar.dart';
 import './pages/pomodoro.dart';
 import './pages/todo.dart';
+import './pages/login.dart';
+import './pages/profile.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -21,7 +30,33 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.interTextTheme(),
         scaffoldBackgroundColor: Colors.transparent,
       ),
-      home: const MainNavigationWrapper(),
+      home: const AuthGate(),
+    );
+  }
+}
+
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFFD55087),
+              ),
+            ),
+          );
+        }
+        if (snapshot.hasData) {
+          return const MainNavigationWrapper();
+        }
+        return const LoginPage();
+      },
     );
   }
 }
@@ -51,7 +86,13 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
       const CalendarPage(),
       const PomodoroScreen(),
       const TodoScreen(),
-      const Center(child: Text('Profile Page', style: TextStyle(color: Colors.white, fontSize: 20))),
+      ProfileScreen(
+        onBack: () {
+          setState(() {
+            _currentIndex = 0;
+          });
+        },
+      ),
     ];
 
     return Scaffold(
