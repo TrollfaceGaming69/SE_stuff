@@ -15,7 +15,7 @@ The primary features includes in this app are To-do list, Pomodoro Timer, Calend
 ### Todo
 To record and manage task lists.
 Useful for helping users prioritize tasks.
-<img width="317" height="690" alt="Screenshot 2026-06-12 164556" src="https://github.com/user-attachments/assets/d8800cf3-5690-4e33-89f9-e4ff6df191fe" />
+<img width="517" height="1126" alt="Screenshot 2026-06-12 164556" src="https://github.com/user-attachments/assets/d8800cf3-5690-4e33-89f9-e4ff6df191fe" />
 
 
 ### Calendar
