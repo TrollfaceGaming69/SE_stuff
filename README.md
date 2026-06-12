@@ -32,6 +32,7 @@ Make sure you have installed these dependencies:
 * [Flutter SDK](https://docs.flutter.dev/get-started/install) 
 * [Dart SDK](https://dart.dev/get-started/sdk)
 * [Firebase CLI](https://firebase.google.com/docs/cli)
+* [Android Studio](https://developer.android.com/studio)
 
 ## Installation
 
@@ -44,14 +45,18 @@ cd nama-repositori
 ### Install Dependencies
 
 ```sh
-bash
 flutter pub get
+```
+
+### Check Config Status
+
+```sh
+flutter doctor -v
 ```
 
 ### Run the App (make sure the emulator is on)
 
 ```sh
-bash
 flutter run
 ```
 
