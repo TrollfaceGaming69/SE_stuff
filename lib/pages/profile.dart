@@ -61,7 +61,7 @@ class ProfileScreen extends StatelessWidget {
                     decoration: const BoxDecoration(
                       color: Color(0xFFF2F0F4), 
                       borderRadius: BorderRadius.vertical(
-                        bottom: Radius.circular(40),
+                        bottom: Radius.circular(40), 
                       ),
                     ),
                     padding: EdgeInsets.fromLTRB(
@@ -73,13 +73,12 @@ class ProfileScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Tombol Back
                         IconButton(
                           alignment: Alignment.centerLeft,
                           padding: EdgeInsets.zero,
                           icon: const Icon(
                             Icons.arrow_back,
-                            color: Color(0xFF5C57A5), 
+                            color: Color(0xFF5C57A5),
                             size: 32,
                           ),
                           onPressed: () {
@@ -95,7 +94,7 @@ class ProfileScreen extends StatelessWidget {
                                 width: 140,
                                 height: 140,
                                 decoration: const BoxDecoration(
-                                  color: Color(0xFFB0B0B0), 
+                                  color: Color(0xFFB0B0B0),
                                   shape: BoxShape.circle,
                                 ),
                                 alignment: Alignment.center,

@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:async';
 
-// --- 1. Global Timer Service (Robust Singleton) ---
 class PomodoroTimerService extends ChangeNotifier {
-  // Safe static instance initialized immediately
   static final PomodoroTimerService instance = PomodoroTimerService._internal();
 
   PomodoroTimerService._internal();
@@ -69,7 +67,6 @@ class PomodoroTimerService extends ChangeNotifier {
   }
 }
 
-// --- 2. Pomodoro Screen UI ---
 class PomodoroScreen extends StatefulWidget {
   const PomodoroScreen({super.key});
 
@@ -78,14 +75,12 @@ class PomodoroScreen extends StatefulWidget {
 }
 
 class _PomodoroScreenState extends State<PomodoroScreen> {
-  // --- Colors ---
   final Color bgTopColor = const Color(0xFF5A53A0);
   final Color bgBottomColor = const Color(0xFFD688AB);
   final Color cardColor = const Color(0xFFF2F2F6);
   final Color boxColor = const Color(0xFFBCC0DC);
   final Color darkBlueColor = const Color(0xFF030A59);
 
-  // Safely point to the initialized static instance
   PomodoroTimerService get _timerService => PomodoroTimerService.instance;
 
   @override

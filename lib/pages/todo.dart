@@ -1,12 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import '../model/shared_data.dart';
-
-class Todo {
-  String text;
-  bool isDone;
-
-  Todo({required this.text, this.isDone = false});
-}
+import '../services/todo_service.dart';
 
 class TodoScreen extends StatefulWidget {
   const TodoScreen({super.key});
@@ -22,16 +16,14 @@ class _TodoScreenState extends State<TodoScreen> {
   final Color taskCardColor = const Color(0xFFBCC0DC);
   final Color darkBlueColor = const Color(0xFF030A59);
 
-  void _addTodo() {
-    setState(() {
-      globalTodos.add(Todo(text: ''));
-    });
+  final TodoService _todoService = TodoService();
+
+  void _addTodo() async {
+    await _todoService.addTodo('');
   }
 
-  void _deleteTodo(int index) {
-    setState(() {
-      globalTodos.removeAt(index);
-    });
+  void _deleteTodo(String todoId) async {
+    await _todoService.deleteTodo(todoId);
   }
 
   @override
@@ -72,36 +64,84 @@ class _TodoScreenState extends State<TodoScreen> {
                   child: Column(
                     children: [
                       Expanded(
-                        child: ListView.builder(
-                          itemCount: globalTodos.length,
-                          itemBuilder: (context, index) {
-                            final todo = globalTodos[index];
-                            return Dismissible(
-                              key: UniqueKey(),
-                              direction: DismissDirection.endToStart,
-                              onDismissed: (direction) {
-                                _deleteTodo(index);
-                              },
-                              background: Container(
-                                margin: const EdgeInsets.only(bottom: 15),
-                                decoration: BoxDecoration(
-                                  color: Colors.redAccent,
-                                  borderRadius: BorderRadius.circular(15),
+                        child: StreamBuilder<List<Todo>>(
+                          stream: _todoService.todosStream(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: Color(0xFF5A53A0),
                                 ),
-                                alignment: Alignment.centerRight,
-                                padding: const EdgeInsets.only(right: 20),
-                                child: const Icon(Icons.delete, color: Colors.white),
-                              ),
-                              child: TodoListItem(
-                                todo: todo,
-                                taskCardColor: taskCardColor,
-                                darkBlueColor: darkBlueColor,
-                                onToggle: () {
-                                  setState(() {
-                                    todo.isDone = !todo.isDone;
-                                  });
-                                },
-                              ),
+                              );
+                            }
+
+                            final todos = snapshot.data ?? [];
+
+                            if (todos.isEmpty) {
+                              return Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.check_circle_outline,
+                                      size: 64,
+                                      color: darkBlueColor.withOpacity(0.3),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'No tasks yet',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: darkBlueColor.withOpacity(0.5),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'Tap the button below to add one',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: darkBlueColor.withOpacity(0.4),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+
+                            return ListView.builder(
+                              itemCount: todos.length,
+                              itemBuilder: (context, index) {
+                                final todo = todos[index];
+                                return Dismissible(
+                                  key: ValueKey(todo.id),
+                                  direction: DismissDirection.endToStart,
+                                  onDismissed: (direction) {
+                                    _deleteTodo(todo.id);
+                                  },
+                                  background: Container(
+                                    margin: const EdgeInsets.only(bottom: 15),
+                                    decoration: BoxDecoration(
+                                      color: Colors.redAccent,
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    alignment: Alignment.centerRight,
+                                    padding: const EdgeInsets.only(right: 20),
+                                    child: const Icon(Icons.delete, color: Colors.white),
+                                  ),
+                                  child: TodoListItem(
+                                    todo: todo,
+                                    taskCardColor: taskCardColor,
+                                    darkBlueColor: darkBlueColor,
+                                    onToggle: () {
+                                      _todoService.toggleTodoDone(todo.id, !todo.isDone);
+                                    },
+                                    onTextChanged: (value) {
+                                      _todoService.updateTodoText(todo.id, value);
+                                    },
+                                  ),
+                                );
+                              },
                             );
                           },
                         ),
@@ -151,6 +191,7 @@ class TodoListItem extends StatefulWidget {
   final Color taskCardColor;
   final Color darkBlueColor;
   final VoidCallback onToggle;
+  final ValueChanged<String> onTextChanged;
 
   const TodoListItem({
     super.key,
@@ -158,6 +199,7 @@ class TodoListItem extends StatefulWidget {
     required this.taskCardColor,
     required this.darkBlueColor,
     required this.onToggle,
+    required this.onTextChanged,
   });
 
   @override
@@ -166,6 +208,7 @@ class TodoListItem extends StatefulWidget {
 
 class _TodoListItemState extends State<TodoListItem> {
   late TextEditingController _controller;
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -174,9 +217,26 @@ class _TodoListItemState extends State<TodoListItem> {
   }
 
   @override
+  void didUpdateWidget(covariant TodoListItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.todo.text != oldWidget.todo.text &&
+        widget.todo.text != _controller.text) {
+      _controller.text = widget.todo.text;
+    }
+  }
+
+  @override
   void dispose() {
+    _debounce?.cancel();
     _controller.dispose();
     super.dispose();
+  }
+
+  void _onChanged(String value) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      widget.onTextChanged(value);
+    });
   }
 
   @override
@@ -208,7 +268,7 @@ class _TodoListItemState extends State<TodoListItem> {
           Expanded(
             child: TextFormField(
               controller: _controller,
-              onChanged: (value) => widget.todo.text = value,
+              onChanged: _onChanged,
               style: TextStyle(
                 color: widget.darkBlueColor,
                 fontSize: 16,

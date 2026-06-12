@@ -3,11 +3,19 @@
 import 'package:flutter/material.dart';
 import 'home_music.dart';
 import '../model/shared_data.dart';
+import '../services/todo_service.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   final void Function(int)? onTabRedirect;
   
   const HomeScreen({super.key, this.onTabRedirect});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final TodoService _todoService = TodoService();
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +26,8 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -43,7 +53,7 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 12),
                 
                 GestureDetector(
-                  onTap: () => onTabRedirect?.call(1),
+                  onTap: () => widget.onTabRedirect?.call(1),
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -108,61 +118,82 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     const Text('To Do list', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black)),
                     GestureDetector(
-                      onTap: () => onTabRedirect?.call(3),
+                      onTap: () => widget.onTabRedirect?.call(3),
                       child: Text('View all', style: TextStyle(fontSize: 16, color: Colors.black.withOpacity(0.78), fontWeight: FontWeight.w500)),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE8DEF8), 
-                    borderRadius: BorderRadius.circular(28),
-                  ),
-                  child: Column(
-                    children: List.generate(
-                      globalTodos.length > 3 ? 3 : globalTodos.length, 
-                      (index) {
-                        final item = globalTodos[index];
-                        return Container(
-                          margin: EdgeInsets.only(bottom: index == 2 || index == globalTodos.length - 1 ? 0 : 12),
-                          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF969DEE), 
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: item.isDone 
-                                    ? const Icon(Icons.check, size: 18, color: Color(0xFF030A59))
-                                    : null,
-                              ),
-                              const SizedBox(width: 14),
-                              Expanded(
+                StreamBuilder<List<Todo>>(
+                  stream: _todoService.todosStream(),
+                  builder: (context, snapshot) {
+                    final todos = snapshot.data ?? [];
+
+                    return Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8DEF8), 
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                      child: todos.isEmpty
+                          ? Center(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 20),
                                 child: Text(
-                                  item.text,
+                                  'No tasks yet',
                                   style: TextStyle(
-                                    fontSize: 16, 
-                                    color: Colors.black, 
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w500,
-                                    decoration: item.isDone ? TextDecoration.lineThrough : TextDecoration.none
+                                    color: Colors.black.withOpacity(0.4),
                                   ),
-                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                            ],
-                          ),
-                        );
-                    }),
-                  ),
+                            )
+                          : Column(
+                              children: List.generate(
+                                todos.length > 3 ? 3 : todos.length, 
+                                (index) {
+                                  final item = todos[index];
+                                  return Container(
+                                    margin: EdgeInsets.only(bottom: index == 2 || index == todos.length - 1 ? 0 : 12),
+                                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF969DEE), 
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 24,
+                                          height: 24,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(6),
+                                          ),
+                                          child: item.isDone 
+                                              ? const Icon(Icons.check, size: 18, color: Color(0xFF030A59))
+                                              : null,
+                                        ),
+                                        const SizedBox(width: 14),
+                                        Expanded(
+                                          child: Text(
+                                            item.text,
+                                            style: TextStyle(
+                                              fontSize: 16, 
+                                              color: Colors.black, 
+                                              fontWeight: FontWeight.w500,
+                                              decoration: item.isDone ? TextDecoration.lineThrough : TextDecoration.none
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                              }),
+                            ),
+                    );
+                  },
                 ),
 
                 const SizedBox(height: 24),

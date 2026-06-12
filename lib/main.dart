@@ -10,6 +10,7 @@ import './pages/pomodoro.dart';
 import './pages/todo.dart';
 import './pages/login.dart';
 import './pages/profile.dart';
+import './services/auth_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,7 +53,7 @@ class AuthGate extends StatelessWidget {
             ),
           );
         }
-        if (snapshot.hasData) {
+        if (snapshot.hasData && !AuthService.isRegistering) {
           return const MainNavigationWrapper();
         }
         return const LoginPage();

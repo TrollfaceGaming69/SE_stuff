@@ -1,10 +1,3 @@
-import '../pages/todo.dart';
-
-List<Todo> globalTodos = [
-  Todo(text: 'Send prototype to client'),
-  Todo(text: 'Setup Calendar UI Design'),
-  Todo(text: 'Review mockup design terbaru', isDone: true),
-];
 
 final Map<String, List<Map<String, String>>> globalEventsMap = {
   "2026-06-04": [

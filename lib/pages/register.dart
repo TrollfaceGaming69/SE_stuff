@@ -23,6 +23,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if(!mounted) return;
 
     if(success){
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Registration successful! Please login.'),
+          backgroundColor: Colors.green,
+        ),
+      );
       Navigator.of(context).popUntil((route) => route.isFirst);
     }
     else{

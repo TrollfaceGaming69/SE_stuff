@@ -5,6 +5,8 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  static bool isRegistering = false;
+
   Future<String?> register({
     required String email,
     required String password,
@@ -13,6 +15,7 @@ class AuthService {
     required String gender,
   }) async{
     try{
+      isRegistering = true;
       UserCredential credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
 
       await _firestore.collection("users").doc(credential.user!.uid).set({
@@ -24,10 +27,17 @@ class AuthService {
         'createdAt': FieldValue.serverTimestamp(),
       });
 
+      await _auth.signOut();
+      isRegistering = false;
+
       return null;
     }
     on FirebaseAuthException catch (e){
+      isRegistering = false;
       return _handleAuthError(e.code);
+    } catch (e) {
+      isRegistering = false;
+      return 'An error occurred during registration.';
     }
   }
 

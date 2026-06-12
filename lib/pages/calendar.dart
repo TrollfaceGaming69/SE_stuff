@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../model/shared_data.dart';
+import '../view_model/calendar_function.dart';
+import '../services/schedule_service.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
@@ -9,46 +10,32 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
-  DateTime currentMonthYear = DateTime(2026, 6, 1);
-  DateTime selectedDate = DateTime(2026, 6, 4);
+  late CalendarFunction _viewModel;
 
-  List<DateTime> _generateDropdownItems() {
-    List<DateTime> items = [];
-    for (int year = 2025; year <= 2027; year++) {
-      for (int month = 1; month <= 12; month++) {
-        items.add(DateTime(year, month, 1));
-      }
-    }
-    return items;
+  @override
+  void initState() {
+    super.initState();
+    _viewModel = CalendarFunction();
+    _viewModel.addListener(_onViewModelChanged);
   }
 
-  String _getMonthName(int month) {
-    const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    return months[month - 1];
+  void _onViewModelChanged() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
-  List<String> _getDaysInMonthList(DateTime date) {
-    List<String> days = [];
-    int totalDays = DateUtils.getDaysInMonth(date.year, date.month);
-    int firstWeekday = DateTime(date.year, date.month, 1).weekday;
-    int blankSpaces = firstWeekday == 7 ? 0 : firstWeekday;
-
-    for (int i = 0; i < blankSpaces; i++) {
-      days.add('');
-    }
-    for (int i = 1; i <= totalDays; i++) {
-      days.add(i.toString());
-    }
-    return days;
+  @override
+  void dispose() {
+    _viewModel.removeListener(_onViewModelChanged);
+    _viewModel.dispose();
+    super.dispose();
   }
 
-  void _showEditEventModal(int index, Map<String, String> event) {
-    final titleController = TextEditingController(text: event["title"]);
-    final noteController = TextEditingController(text: event["note"] ?? "");
-    final timeController = TextEditingController(text: event["time"]);
+  void _showEditEventModal(ScheduleEvent event) {
+    final titleController = TextEditingController(text: event.title);
+    final noteController = TextEditingController(text: event.note);
+    final timeController = TextEditingController(text: event.time);
 
     showModalBottomSheet(
       context: context,
@@ -72,7 +59,7 @@ class _CalendarPageState extends State<CalendarPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  '${_getMonthName(selectedDate.month)} ${selectedDate.day}, ${selectedDate.year}',
+                  '${_viewModel.getMonthName(_viewModel.selectedDate.month)} ${_viewModel.selectedDate.day}, ${_viewModel.selectedDate.year}',
                   style: const TextStyle(color: Color(0xFF1E2865), fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 24),
@@ -140,10 +127,7 @@ class _CalendarPageState extends State<CalendarPage> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                           ),
                           onPressed: () {
-                            String dateKey = "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
-                            setState(() {
-                              globalEventsMap[dateKey]!.removeAt(index);
-                            });
+                            _viewModel.deleteEvent(event);
                             Navigator.pop(context);
                           },
                           child: const Text(
@@ -164,14 +148,12 @@ class _CalendarPageState extends State<CalendarPage> {
                           ),
                           onPressed: () {
                             if (titleController.text.isNotEmpty) {
-                              String dateKey = "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
-                              setState(() {
-                                globalEventsMap[dateKey]![index] = {
-                                  "time": timeController.text,
-                                  "title": titleController.text,
-                                  "note": noteController.text,
-                                };
-                              });
+                              _viewModel.updateEvent(
+                                event: event,
+                                title: titleController.text,
+                                note: noteController.text,
+                                time: timeController.text,
+                              );
                               Navigator.pop(context);
                             }
                           },
@@ -224,7 +206,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${_getMonthName(selectedDate.month)} ${selectedDate.day}, ${selectedDate.year}',
+                  '${_viewModel.getMonthName(_viewModel.selectedDate.month)} ${_viewModel.selectedDate.day}, ${_viewModel.selectedDate.year}',
                   style: const TextStyle(color: Color(0xFF1E2865), fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 24),
@@ -295,17 +277,11 @@ class _CalendarPageState extends State<CalendarPage> {
                     ),
                     onPressed: () {
                       if (titleController.text.isNotEmpty) {
-                        String dateKey = "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
-                        setState(() {
-                          if (globalEventsMap[dateKey] == null) {
-                            globalEventsMap[dateKey] = [];
-                          }
-                          globalEventsMap[dateKey]!.add({
-                            "time": timeController.text,
-                            "title": titleController.text,
-                            "note": noteController.text,
-                          });
-                        });
+                        _viewModel.addEvent(
+                          title: titleController.text,
+                          note: noteController.text,
+                          time: timeController.text,
+                        );
                         Navigator.pop(context);
                       }
                     },
@@ -332,10 +308,9 @@ class _CalendarPageState extends State<CalendarPage> {
     const Color textDarkColor = Color(0xFF1E2865);
 
     final List<String> daysOfWeek = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-    final List<String> daysInMonth = _getDaysInMonthList(currentMonthYear);
+    final List<String> daysInMonth = _viewModel.getDaysInMonthList(_viewModel.currentMonthYear);
 
-    String selectedDateKey = "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
-    List<Map<String, String>> currentEvents = globalEventsMap[selectedDateKey] ?? [];
+    List<ScheduleEvent> currentEvents = _viewModel.currentEvents;
 
     return Scaffold(
       body: Container(
@@ -355,213 +330,208 @@ class _CalendarPageState extends State<CalendarPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-              const SizedBox(height: 16),
-              
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Theme(
-                  data: Theme.of(context).copyWith(
-                    popupMenuTheme: const PopupMenuThemeData(
-                      textStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  child: PopupMenuButton<DateTime>(
-                    onSelected: (DateTime newValue) {
-                      setState(() {
-                        currentMonthYear = newValue;
-                      });
-                    },
-                    color: bgMiddle,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    offset: const Offset(0, 40),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min, 
-                      children: [
-                        Text(
-                          "${_getMonthName(currentMonthYear.month)} ${currentMonthYear.year}",
-                          style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(width: 6),
-                        const Icon(Icons.keyboard_arrow_up, color: Colors.white, size: 28),
-                      ],
-                    ),
-                    itemBuilder: (BuildContext context) {
-                      return _generateDropdownItems().map((DateTime date) {
-                        return PopupMenuItem<DateTime>(
-                          value: date,
-                          child: Text(
-                            "${_getMonthName(date.month)} ${date.year}",
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        );
-                      }).toList();
-                    },
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: containerColor,
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: daysOfWeek.map((day) => Expanded(
-                          child: Text(
-                            day,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: textDarkColor.withValues(alpha: 0.8),
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                            ),
-                          ),
-                        )).toList(),
+                const SizedBox(height: 16),
+                
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                      popupMenuTheme: const PopupMenuThemeData(
+                        textStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(height: 8),
-                      const Divider(height: 1, color: Colors.grey),
-                      const SizedBox(height: 12),
-                      
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 7,
-                          mainAxisSpacing: 12,
-                          crossAxisSpacing: 8,
-                        ),
-                        itemCount: daysInMonth.length,
-                        itemBuilder: (context, index) {
-                          String dayText = daysInMonth[index];
-                          if (dayText.isEmpty) return const SizedBox.shrink();
-
-                          int dayInt = int.parse(dayText);
-                          DateTime cellDate = DateTime(currentMonthYear.year, currentMonthYear.month, dayInt);
-                          
-                          bool isSelected = selectedDate.year == cellDate.year &&
-                                            selectedDate.month == cellDate.month &&
-                                            selectedDate.day == cellDate.day;
-
-                          String cellDateKey = "${cellDate.year}-${cellDate.month.toString().padLeft(2, '0')}-${cellDate.day.toString().padLeft(2, '0')}";
-                          bool hasEvent = globalEventsMap.containsKey(cellDateKey) && globalEventsMap[cellDateKey]!.isNotEmpty;
-
-                          BoxDecoration boxDecoration = const BoxDecoration();
-                          TextStyle textStyle = const TextStyle(color: textDarkColor, fontWeight: FontWeight.w500);
-
-                          if (isSelected) {
-                            boxDecoration = const BoxDecoration(
-                              color: Color(0xFF5E65A7),
-                              shape: BoxShape.circle,
-                            );
-                            textStyle = const TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
-                          } else if (hasEvent) {
-                            boxDecoration = BoxDecoration(
-                              border: Border.all(color: textDarkColor.withValues(alpha: 0.5), width: 1),
-                              shape: BoxShape.circle,
-                            );
-                            textStyle = const TextStyle(color: textDarkColor, fontWeight: FontWeight.bold);
-                          }
-
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedDate = cellDate;
-                              });
-                            },
-                            child: Container(
-                              alignment: Alignment.center,
-                              decoration: boxDecoration,
-                              child: Text(dayText, style: textStyle),
+                    ),
+                    child: PopupMenuButton<DateTime>(
+                      onSelected: (DateTime newValue) {
+                        _viewModel.setMonthYear(newValue);
+                      },
+                      color: bgMiddle,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      offset: const Offset(0, 40),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min, 
+                        children: [
+                          Text(
+                            "${_viewModel.getMonthName(_viewModel.currentMonthYear.month)} ${_viewModel.currentMonthYear.year}",
+                            style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(width: 6),
+                          const Icon(Icons.keyboard_arrow_up, color: Colors.white, size: 28),
+                        ],
+                      ),
+                      itemBuilder: (BuildContext context) {
+                        return _viewModel.generateDropdownItems().map((DateTime date) {
+                          return PopupMenuItem<DateTime>(
+                            value: date,
+                            child: Text(
+                              "${_viewModel.getMonthName(date.month)} ${date.year}",
+                              style: const TextStyle(color: Colors.white),
                             ),
                           );
-                        },
+                        }).toList();
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: containerColor,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: daysOfWeek.map((day) => Expanded(
+                            child: Text(
+                              day,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: textDarkColor.withValues(alpha: 0.8),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          )).toList(),
+                        ),
+                        const SizedBox(height: 8),
+                        const Divider(height: 1, color: Colors.grey),
+                        const SizedBox(height: 12),
+                        
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 7,
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 8,
+                          ),
+                          itemCount: daysInMonth.length,
+                          itemBuilder: (context, index) {
+                            String dayText = daysInMonth[index];
+                            if (dayText.isEmpty) return const SizedBox.shrink();
+
+                            int dayInt = int.parse(dayText);
+                            DateTime cellDate = DateTime(_viewModel.currentMonthYear.year, _viewModel.currentMonthYear.month, dayInt);
+                            
+                            bool isSelected = _viewModel.selectedDate.year == cellDate.year &&
+                                              _viewModel.selectedDate.month == cellDate.month &&
+                                              _viewModel.selectedDate.day == cellDate.day;
+
+                            bool hasEvent = _viewModel.hasEventsOnDate(cellDate);
+
+                            BoxDecoration boxDecoration = const BoxDecoration();
+                            TextStyle textStyle = const TextStyle(color: textDarkColor, fontWeight: FontWeight.w500);
+
+                            if (isSelected) {
+                              boxDecoration = const BoxDecoration(
+                                color: Color(0xFF5E65A7),
+                                shape: BoxShape.circle,
+                              );
+                              textStyle = const TextStyle(color: Colors.white, fontWeight: FontWeight.bold);
+                            } else if (hasEvent) {
+                              boxDecoration = BoxDecoration(
+                                border: Border.all(color: textDarkColor.withValues(alpha: 0.5), width: 1),
+                                shape: BoxShape.circle,
+                              );
+                              textStyle = const TextStyle(color: textDarkColor, fontWeight: FontWeight.bold);
+                            }
+
+                            return GestureDetector(
+                              onTap: () {
+                                _viewModel.selectDate(cellDate);
+                              },
+                              child: Container(
+                                alignment: Alignment.center,
+                                decoration: boxDecoration,
+                                child: Text(dayText, style: textStyle),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Schedule',
+                            style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            '${_viewModel.getMonthName(_viewModel.selectedDate.month)} ${_viewModel.selectedDate.day}, ${_viewModel.selectedDate.year}',
+                            style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 24, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.add_circle, color: Colors.white, size: 32),
+                        onPressed: _showAddEventModal,
                       ),
                     ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 24),
+                const SizedBox(height: 12),
 
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Schedule',
-                          style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          '${_getMonthName(selectedDate.month)} ${selectedDate.day}, ${selectedDate.year}',
-                          style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.add_circle, color: Colors.white, size: 32),
-                      onPressed: _showAddEventModal,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              currentEvents.isEmpty
-                  ? const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24.0),
-                      child: Center(
-                        child: Text(
-                          'No events for this day.',
-                          style: TextStyle(color: Colors.white70, fontSize: 16),
-                        ),
-                      ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: currentEvents.length,
-                      itemBuilder: (context, index) {
-                        final event = currentEvents[index];
-                        return GestureDetector(
-                          onTap: () => _showEditEventModal(index, event),
-                          child: Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: containerColor,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  event["time"] ?? '',
-                                  style: const TextStyle(color: Color(0xFF5E65A7), fontSize: 13, fontWeight: FontWeight.w500),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  event["title"] ?? '',
-                                  style: const TextStyle(color: Color(0xFF1E2865), fontSize: 18, fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
+                currentEvents.isEmpty
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 24.0),
+                        child: Center(
+                          child: Text(
+                            'No events for this day.',
+                            style: TextStyle(color: Colors.white70, fontSize: 16),
                           ),
-                        );
-                      },
-                    ),
-              const SizedBox(height: 24),
-            ],
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: currentEvents.length,
+                        itemBuilder: (context, index) {
+                          final event = currentEvents[index];
+                          return GestureDetector(
+                            onTap: () => _showEditEventModal(event),
+                            child: Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: containerColor,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    event.time,
+                                    style: const TextStyle(color: Color(0xFF5E65A7), fontSize: 13, fontWeight: FontWeight.w500),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    event.title,
+                                    style: const TextStyle(color: Color(0xFF1E2865), fontSize: 18, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                const SizedBox(height: 24),
+              ],
             ),
           ),
         ),
