@@ -32,7 +32,7 @@ Make sure you have installed these dependencies:
 * [Flutter SDK](https://docs.flutter.dev/get-started/install) 
 * [Dart SDK](https://dart.dev/get-started/sdk)
 * [Firebase CLI](https://firebase.google.com/docs/cli)
-* [Android Studio](https://developer.android.com/studio)
+* [Android Studio](https://developer.android.com/studio) (for android emulator)
 
 ## Installation
 
