@@ -15,24 +15,20 @@ The primary features includes in this app are To-do list, Pomodoro Timer, Calend
 ### Todo
 To record and manage task lists.
 Useful for helping users prioritize tasks.
-<img width="517" height="1126" alt="Screenshot 2026-06-12 164556" src="https://github.com/user-attachments/assets/d8800cf3-5690-4e33-89f9-e4ff6df191fe" />
 
 
 ### Calendar
 To save important schedules and deadlines.
 Useful to help users manage time more regularly.
-<img width="451" height="987" alt="Screenshot 2026-06-12 164642" src="https://github.com/user-attachments/assets/d202a359-12a6-41b1-833b-9a27ff4d9d20" />
 
 
 ### Pomodoro Timer
 To organize study sessions using the Pomodoro method.
 Useful to help improve learning focus.
-<img width="471" height="1027" alt="Screenshot 2026-06-12 164708" src="https://github.com/user-attachments/assets/97facec0-3c75-4e61-9069-33fe650a6a2b" />
 
 
 ### Music Support
 To provide music as a learning support
-<img width="582" height="1270" alt="Screenshot 2026-06-12 164736" src="https://github.com/user-attachments/assets/c7b58e34-dffa-4019-8564-9a8921afaef0" />
 
 
 ## Getting Started
