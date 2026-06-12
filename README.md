@@ -1,4 +1,4 @@
-# MyStudy
+<img width="418" height="113" alt="Screenshot 2026-06-12 140216" src="https://github.com/user-attachments/assets/17a7b404-b5bb-4bc8-9f0d-0322b23df4c7" /># MyStudy
 
 ## Project Description
 MyStudy is a mobile app designed to help students manage learning activities in one integrated platform.
@@ -55,6 +55,27 @@ flutter doctor -v
 ```
 
 ### Run the App (make sure the emulator is on)
+
+```sh
+flutter run
+```
+
+## Test Using Browser
+Trying to run the app using android emulator can be quite tricky, so if you face difficulties just run it using browser like when inspecting website, just make sure set the inspector aspec ratio is made as similar as possible to phone aspec ratio
+
+### Make Sure VSCode Desktop development with C++ is checked
+- Open Visual Studio Installer
+- Select Modify on the Visual Studio installation.
+- Checked the Desktop development with C++
+<img width="418" height="113" alt="Screenshot 2026-06-12 140216" src="https://github.com/user-attachments/assets/2edf9e87-a0a1-4156-8b42-f1b346e4ca8d" />
+
+### Check Config Status
+
+```sh
+flutter doctor -v
+```
+
+### Run The App (make sure chrome is selected as the device)
 
 ```sh
 flutter run
