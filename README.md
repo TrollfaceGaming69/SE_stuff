@@ -1,4 +1,4 @@
-<img width="418" height="113" alt="Screenshot 2026-06-12 140216" src="https://github.com/user-attachments/assets/17a7b404-b5bb-4bc8-9f0d-0322b23df4c7" /># MyStudy
+# MyStudy
 
 ## Project Description
 MyStudy is a mobile app designed to help students manage learning activities in one integrated platform.
