@@ -4,7 +4,7 @@
 MyStudy is a mobile app designed to help students manage learning activities in one integrated platform.
 The primary features includes in this app are To-do list, Pomodoro Timer, Calendar, and Music Player
 
-## Project Objective
+## Project Objectives
 - Provides a Todo List feature to record and manage college assignments and personal activities.
 - Provides Scheduling features to manage lecture schedules, exams, organizational meetings, and other activities.
 - Help students remember deadlines through a notification or reminder system.
@@ -12,7 +12,6 @@ The primary features includes in this app are To-do list, Pomodoro Timer, Calend
 - Reduce the risk of late assignments or missed schedules with an easy-to-understand display.
 
 ## Features
-
 ### Todo
 To record and manage task lists.
 Useful for helping users prioritize tasks.
